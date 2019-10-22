@@ -4,6 +4,7 @@ const gulp = require('gulp'),
       browserSync = require('browser-sync'),
       sass = require('gulp-sass'),
       pug = require('gulp-pug'),
+      htmlValidator = require('gulp-w3c-html-validator'),
       concat = require("gulp-concat"),
       rename = require("gulp-rename"),
       newer = require('gulp-newer'),
@@ -52,6 +53,7 @@ gulp.task('templates', function () {
     .pipe(pug({
       pretty: true
     }))
+    .pipe(htmlValidator())
     .pipe(gulp.dest(paths.html.dest))
     .pipe(browserSync.reload({
       stream: true
