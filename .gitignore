@@ -1,0 +1,9 @@
+/node_modules/
+/.git/
+/**/Thumbs.db
+/**/*.DS_Store
+build
+node_modules
+.zip
+yarn.lock
+.idea
