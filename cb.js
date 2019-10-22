@@ -14,7 +14,7 @@ const mkdirp = require('mkdirp');        // зависимость, должна
 const rmdir = require('rmdir');           // зависимость, должна быть установлена (см. описание выше)
 
 let blockName = process.argv[2];          // получим имя блока
-let defaultExtensions = ['pug', 'scss', 'js']; // расширения по умолчанию
+let defaultExtensions = ['pug', 'scss']; // расширения по умолчанию
 let extensions = uniqueArray(defaultExtensions.concat(process.argv.slice(3)));  // добавим введенные при вызове расширения (если есть)
 
 // Если есть имя блока
@@ -72,7 +72,7 @@ function createBlock() {
         // Если это PUG
         if(extention == 'pug') {
           templateFileImport = 'include ../blocks/' + blockName + '/' + blockName + '.pug';
-          fileContent = 'mixin ' + blockName + '(data)\n' + '  +b.' + blockName + '&attributes(attributes)';
+          fileContent = 'mixin ' + blockName + '\n' + '  +b.' + blockName;
 
           fs.appendFile('src/templates/blocks.pug', '\n' + templateFileImport, function (err) {
             if(err) {
