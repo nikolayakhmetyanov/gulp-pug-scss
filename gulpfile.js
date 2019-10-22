@@ -26,9 +26,9 @@ const paths = {
     watch: ['./src/blocks/**/*.scss', './src/styles/**/*.scss', './src/styles/*.scss']
   },
   js: {
-    src: ['./src/plugins/*.js', './src/js/common.js', './src/blocks/**/*.js'],
+    src: ['./src/js/common.js'],
     dest: './build/js',
-    watch: ['./src/blocks/**/*.js', './src/js/common.js'],
+    watch: ['./src/js/common.js'],
     watchPlugins: './src/plugins/*.js'
   },
   images: {
@@ -53,7 +53,7 @@ gulp.task('templates', function () {
     .pipe(pug({
       pretty: true
     }))
-    .pipe(htmlValidator())
+    .pipe(htmlValidator()) 
     .pipe(gulp.dest(paths.html.dest))
     .pipe(browserSync.reload({
       stream: true
