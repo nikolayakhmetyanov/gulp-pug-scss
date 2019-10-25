@@ -1,3 +1,7 @@
+global.$ = {
+  fs: require('fs'),
+};
+
 const gulp = require('gulp'),
       del = require('del'),
       autoprefixer = require('gulp-autoprefixer'),
@@ -51,6 +55,9 @@ gulp.task('templates', function () {
   return gulp.src(paths.html.src)
     .pipe(plumber())
     .pipe(pug({
+      locals : {
+        nav: JSON.parse($.fs.readFileSync('./src/assets/navigation.json', 'utf8'))
+      },
       pretty: true
     }))
     .pipe(htmlValidator()) 
@@ -82,7 +89,7 @@ gulp.task('scripts', function () {
 });
 
 // Responsive Images
-var quality = 95; // Responsive images quality
+var quality = 50; // Responsive images quality
 
 // Produce @1x images
 gulp.task('img-responsive-1x', async function() {
