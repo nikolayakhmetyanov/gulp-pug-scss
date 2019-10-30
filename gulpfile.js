@@ -40,6 +40,11 @@ const paths = {
     dest: './build/img/',
     watch: ['./src/assets/img/**/*']
   },
+  svg: {
+    src: './src/assets/img/svg/**/*',
+    dest: './build/img/',
+    watch: ['./src/assets/img/**/*']
+  },
   fonts: {
     src: './src/assets/fonts/*',
     dest: './build/fonts',
@@ -118,7 +123,15 @@ gulp.task('cleanimg', function() {
   return del([paths.images.dest + '@*'], { force: true })
 });
 
-gulp.task('images', gulp.series('img-responsive-1x', 'img-responsive-2x'));
+gulp.task('svg', function () {
+  return gulp.src(paths.svg.src)
+    .pipe(gulp.dest(paths.svg.dest))
+    .pipe(browserSync.reload({
+      stream: true
+    }));
+});
+
+gulp.task('images', gulp.series('svg', 'img-responsive-1x', 'img-responsive-2x'));
 
 gulp.task('fonts', function () {
   return gulp.src(paths.fonts.src)
