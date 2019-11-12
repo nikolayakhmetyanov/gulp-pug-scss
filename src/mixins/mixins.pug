@@ -8,3 +8,6 @@ mixin navMenu(data)
         +e.A(href= item.link class='link-level-' + item.level)= item.title
         if item.submenu
           +navMenu(item.submenu)
+
+mixin imgRetina(img, retina, alt)
+  img(src=img srcset=retina alt=alt)
