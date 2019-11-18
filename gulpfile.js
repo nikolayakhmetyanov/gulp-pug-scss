@@ -13,7 +13,8 @@ const gulp = require('gulp'),
       rename = require("gulp-rename"),
       newer = require('gulp-newer'),
       responsive = require('gulp-responsive'),
-      plumber = require('gulp-plumber');
+      plumber = require('gulp-plumber'),
+      rsync = require('gulp-rsync');
 
 const paths = {
   dirs: {
@@ -30,7 +31,7 @@ const paths = {
     watch: ['./src/blocks/**/*.scss', './src/styles/**/*.scss', './src/styles/*.scss']
   },
   js: {
-    src: ['./src/js/common.js'],
+    src: ['./src/plugins/**/*.js', './src/js/common.js'],
     dest: './build/js',
     watch: ['./src/js/common.js'],
     watchPlugins: './src/plugins/*.js'
@@ -157,6 +158,20 @@ gulp.task('server', function () {
   gulp.watch(paths.fonts.watch, gulp.parallel('fonts'));
 });
 
+gulp.task('deploy', function() {
+  return gulp.src('dist/**')
+  .pipe(rsync({
+    root: 'dist/',
+    hostname: 'user666@mydomain.com',
+    destination: 'www/mydomain.com/',
+    // include: ['*.htaccess'], // Includes files to deploy
+    exclude: ['**/Thumbs.db', '**/*.DS_Store'], // Excludes files from deploy
+    recursive: true,
+    archive: true,
+    silent: false,
+    compress: true
+  }))
+});
 
 gulp.task('build', gulp.series(
   'clean',
