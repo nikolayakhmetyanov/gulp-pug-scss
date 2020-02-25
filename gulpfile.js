@@ -6,13 +6,15 @@ const gulp = require('gulp'),
       del = require('del'),
       autoprefixer = require('gulp-autoprefixer'),
       browserSync = require('browser-sync'),
+      uglify = require('gulp-uglify-es').default;
       sass = require('gulp-sass'),
+      cleancss = require('gulp-clean-css'),
       pug = require('gulp-pug'),
       htmlValidator = require('gulp-w3c-html-validator'),
       concat = require("gulp-concat"),
       rename = require("gulp-rename"),
       newer = require('gulp-newer'),
-      responsive = require('gulp-responsive'),
+      imagemin = require('gulp-imagemin'),
       plumber = require('gulp-plumber'),
       rsync = require('gulp-rsync');
 
@@ -37,12 +39,7 @@ const paths = {
     watchPlugins: './src/plugins/*.js'
   },
   images: {
-    src: './src/assets/img/src/**/*',
-    dest: './build/img/',
-    watch: ['./src/assets/img/**/*']
-  },
-  svg: {
-    src: './src/assets/img/svg/**/*',
+    src: './src/assets/img/**/*',
     dest: './build/img/',
     watch: ['./src/assets/img/**/*']
   },
@@ -52,10 +49,6 @@ const paths = {
     watch: './src/assets/fonts/*'
   }
 };
-
-gulp.task('clean', function () {
-  return del(paths.dirs.build);
-});
 
 gulp.task('templates', function () {
   return gulp.src(paths.html.src)
@@ -81,6 +74,7 @@ gulp.task('styles', function () {
       grid: true,
       overrideBrowserslist: ['last 10 versions']
     }))
+    .pipe(cleancss( {level: { 1: { specialComments: 0 } } }))
     .pipe(gulp.dest(paths.css.dest))
     .pipe(browserSync.reload({
       stream: true
@@ -91,48 +85,35 @@ gulp.task('scripts', function () {
   return gulp.src(paths.js.src)
     .pipe(plumber())
     .pipe(concat('scripts.js'))
+    .pipe(uglify())
     .pipe(gulp.dest(paths.js.dest));
 });
 
-// Responsive Images
-var quality = 50; // Responsive images quality
-
-// Produce @1x images
-gulp.task('img-responsive-1x', async function() {
-  return gulp.src(paths.images.src + '.{png,jpg,jpeg,webp,raw}')
-    .pipe(newer(paths.images.dest + '@1x'))
-    .pipe(responsive({
-      '**/*': { width: '50%', quality: quality }
-    })).on('error', function (e) { console.log(e) })
-    .pipe(rename(function (path) {path.extname = path.extname.replace('jpeg', 'jpg')}))
-    .pipe(gulp.dest(paths.images.dest + '@1x'))
+gulp.task('images', async function() {
+  return gulp.src(paths.images.src)
+    .pipe(newer(paths.images.dest))
+    .pipe(
+      imagemin([
+        imagemin.gifsicle({ interlaced: true }),
+        imagemin.mozjpeg({ progressive: true }),
+        imagemin.optipng({ optimizationLevel: 5 }),
+        imagemin.svgo({
+          plugins: [
+            {
+              removeViewBox: false,
+              collapseGroups: true
+            }
+          ]
+        })
+      ])
+    )
+    .pipe(gulp.dest(paths.images.dest))
 });
 
-// Produce @2x images
-gulp.task('img-responsive-2x', async function() {
-  return gulp.src(paths.images.src + '.{png,jpg,jpeg,webp,raw}')
-    .pipe(newer(paths.images.dest + '@2x'))
-    .pipe(responsive({
-      '**/*': { width: '100%', quality: quality }
-    })).on('error', function (e) { console.log(e) })
-    .pipe(rename(function (path) {path.extname = path.extname.replace('jpeg', 'jpg')}))
-    .pipe(gulp.dest(paths.images.dest + '@2x'))
-});
-
-// Clean @*x IMG's
+// Clean IMG's
 gulp.task('cleanimg', function() {
-  return del([paths.images.dest + '@*'], { force: true })
+  return del([paths.images.dest], { force: true })
 });
-
-gulp.task('svg', function () {
-  return gulp.src(paths.svg.src)
-    .pipe(gulp.dest(paths.svg.dest))
-    .pipe(browserSync.reload({
-      stream: true
-    }));
-});
-
-gulp.task('images', gulp.series('svg', 'img-responsive-1x', 'img-responsive-2x'));
 
 gulp.task('fonts', function () {
   return gulp.src(paths.fonts.src)
@@ -171,6 +152,10 @@ gulp.task('deploy', function() {
     silent: false,
     compress: true
   }))
+});
+
+gulp.task('clean', function () {
+  return del(paths.dirs.build);
 });
 
 gulp.task('build', gulp.series(
