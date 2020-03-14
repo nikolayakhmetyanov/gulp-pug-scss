@@ -11,3 +11,9 @@ mixin navMenu(data)
 
 mixin imgRetina(img, retina, alt)
   img(src=img srcset=retina alt=alt)
+
+// +icon('arr_round','red_mod')
+mixin icon(name,mod)
+  - mod = mod || ''
+  svg(class="icon icon-" + name + ' ' + mod)
+    use(xlink:href="img/icons/sprite.svg#" + name)

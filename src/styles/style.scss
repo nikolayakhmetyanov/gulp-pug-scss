@@ -1,7 +1,9 @@
 @import '../mixins/mixins';
+@import '../plugins/normalize';
 
 /* Global styles */
 @import 'fonts';
 @import 'global';
+//@import 'sprite';
 
 /* Blocks */
