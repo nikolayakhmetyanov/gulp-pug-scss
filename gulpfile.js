@@ -16,10 +16,6 @@ const gulp = require('gulp'),
       newer = require('gulp-newer'),
       imagemin = require('gulp-imagemin'),
       plumber = require('gulp-plumber'),
-      svgSprite = require('gulp-svg-sprite'),
-      svgmin = require('gulp-svgmin'),
-      cheerio = require('gulp-cheerio'),
-      replace = require('gulp-replace'),
       rsync = require('gulp-rsync');
 
 const paths = {
@@ -43,9 +39,9 @@ const paths = {
     watchPlugins: './src/plugins/*.js'
   },
   images: {
-    src: ['./src/assets/img/**/*', '!./src/assets/img/icons/*.svg'],
+    src: ['./src/assets/img/**/*'],
     dest: './build/img/',
-    watch: ['./src/assets/img/**/*', '!./src/assets/img/icons/']
+    watch: ['./src/assets/img/**/*']
   },
   fonts: {
     src: './src/assets/fonts/*',
@@ -58,6 +54,7 @@ gulp.task('templates', function () {
   return gulp.src(paths.html.src)
     .pipe(plumber())
     .pipe(pug({
+      basedir: './src/',
       /*locals : {
         nav: JSON.parse($.fs.readFileSync('./src/assets/navigation.json', 'utf8'))
       },*/
@@ -112,43 +109,6 @@ gulp.task('images', async function() {
       ])
     )
     .pipe(gulp.dest(paths.images.dest))
-});
-
-//svg sprite
-gulp.task('svg-sprite', function () {
-	return gulp.src('./src/assets/img/icons/*.svg')
-	// minify svg
-		.pipe(svgmin({
-			js2svg: {
-				pretty: true
-			}
-		}))
-		// remove all fill, style and stroke declarations in out shapes
-		.pipe(cheerio({
-			run: function ($) {
-				//$('[fill]').removeAttr('fill');
-				//$('[stroke]').removeAttr('stroke');
-				//$('[style]').removeAttr('style');
-			},
-			parserOptions: {xmlMode: true}
-		}))
-		// cheerio plugin create unnecessary string '&gt;', so replace it.
-		.pipe(replace('&gt;', '>'))
-		// build svg sprite
-		.pipe(svgSprite({
-			mode: {
-				symbol: {
-					sprite: "../sprite.svg",
-					render: {
-						scss: {
-							dest: "../../../../src/styles/sprite.scss",
-							template: "./src/mixins/sprite-template.scss"
-						}
-					}
-				}
-			}
-		}))
-		.pipe(gulp.dest('build/img/icons/'));
 });
 
 // Clean IMG's
